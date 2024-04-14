@@ -5,30 +5,28 @@
 #include <thread>
 #include <mutex>
 
-uint8_t Inversion(uint8_t *begin, uint8_t *end, const uint8_t &data, const uint8_t &mask) {
+uint8_t Inversion(uint8_t *begin, uint8_t *end, uint8_t data, const uint8_t &mask) {
   if (begin == end) {
     return 0;
   }
   
-  uint8_t result = data;
   for (; begin != end; ++begin) {
-    result ^= mask;
+    data ^= mask;
   }
-  return result;
+  return data;
 }
 
-void ParallelInversion(uint8_t *begin, uint8_t *end, const uint8_t &data, const uint8_t &mask, std::promise<uint8_t> && resultPromise) {
+void ParallelInversion(uint8_t *begin, uint8_t *end, uint8_t data, const uint8_t &mask, std::promise<uint8_t> && resultPromise) {
   std::mutex mtx;
-  std::lock_guard<std::mutex> lock(mtx);
   if (begin == end) {
     return;
   }
   
-  uint8_t result = data;
+  std::lock_guard<std::mutex> lock(mtx);
   for (; begin != end; ++begin) {
-    result ^= mask;
+    data ^= mask;
   }
-  resultPromise.set_value(result);
+  resultPromise.set_value(data);
 }
 
 int main(int argc, char *argv[]) {
