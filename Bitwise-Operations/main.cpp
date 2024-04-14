@@ -5,7 +5,7 @@
 #include <thread>
 #include <mutex>
 
-uint8_t Inversion(uint8_t *begin, uint8_t *end, uint8_t data, const uint8_t &mask) {
+uint8_t Inversion(const uint8_t *begin, const uint8_t *end, uint8_t data, const uint8_t &mask) {
   if (begin == end) {
     return 0;
   }
@@ -16,7 +16,7 @@ uint8_t Inversion(uint8_t *begin, uint8_t *end, uint8_t data, const uint8_t &mas
   return data;
 }
 
-void ParallelInversion(uint8_t *begin, uint8_t *end, uint8_t data, const uint8_t &mask, std::promise<uint8_t> && resultPromise) {
+void ParallelInversion(const uint8_t *begin, const uint8_t *end, uint8_t data, const uint8_t &mask, std::promise<uint8_t> && resultPromise) {
   std::mutex mtx;
   if (begin == end) {
     return;
