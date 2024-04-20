@@ -41,3 +41,15 @@ void forward_list<T>::print() const {
   }
   std::cout << std::endl;
 }
+
+template<typename T>
+void forward_list<T>::clear() {
+  while(count_) {
+    pop_front();
+  }
+}
+
+template<typename T>
+forward_list<T>::~forward_list() {
+  clear();
+}
