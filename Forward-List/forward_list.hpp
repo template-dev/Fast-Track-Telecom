@@ -4,13 +4,12 @@
 template<typename T>
 class forward_list {
 public:
-  forward_list() noexcept;
-  explicit forward_list(const T& value) noexcept;
+  explicit forward_list(const T& value = T{}) noexcept;
   
   forward_list(const forward_list& other) noexcept;
   forward_list(forward_list&& other) noexcept;
   forward_list& operator=(const forward_list& other) noexcept;
-  forward_list& operator=(const forward_list&& other) noexcept;
+  forward_list& operator=(forward_list&& other) noexcept;
   
   void push_back(const T& value);
   void push_front(const T& value);
@@ -19,9 +18,9 @@ public:
   void insert(size_t pos, const T& value);
   void erase(const T& value);
   void clear();
-  bool isEmpty() const;
+  bool isEmpty() const { return count_ == 0; };
   
-  forward_list();
+  ~forward_list() = default;
   
 private:
   template<typename N>
