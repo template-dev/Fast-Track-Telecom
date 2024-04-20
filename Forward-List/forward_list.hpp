@@ -19,15 +19,16 @@ public:
   void erase(const T& value);
   void clear();
   bool isEmpty() const { return count_ == 0; };
+  void print() const;
   
   ~forward_list() = default;
   
 private:
   template<typename N>
   struct Node {
-  Node(N data = N{}, Node* next = nullptr)
-    : data_{data}
-    , next_{next}
+    Node(N data = N{}, Node* next = nullptr)
+      : data_{data}
+      , next_{next}
     {}
     N data_;
     Node* next_;
@@ -35,5 +36,7 @@ private:
   Node<T>* pHead_;
   size_t count_;
 };
+
+#include "forward_list.inl"
 
 #endif // FAST_TRACK_TELECOM_FORWARD_LIST_HPP
