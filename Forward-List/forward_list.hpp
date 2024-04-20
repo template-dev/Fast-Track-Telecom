@@ -4,7 +4,8 @@
 template<typename T>
 class forward_list {
 public:
-  explicit forward_list(const T& value = T{}) noexcept;
+  forward_list();
+  explicit forward_list(const T& value) noexcept;
   
   forward_list(const forward_list& other) noexcept;
   forward_list(forward_list&& other) noexcept;

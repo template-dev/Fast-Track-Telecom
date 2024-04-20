@@ -1,13 +1,16 @@
 #include "forward_list.hpp"
 
 template<typename T>
-forward_list<T>::forward_list(const T& value /*= T{}*/) noexcept
+forward_list<T>::forward_list()
   : pHead_{nullptr}
   , count_{0}
-{
-  pHead_ = new Node<T>(value);
-  ++count_;
-}
+{}
+
+template<typename T>
+forward_list<T>::forward_list(const T& value) noexcept
+  : pHead_{new Node<T>(value)}
+  , count_{1}
+{}
 
 template<typename T>
 void forward_list<T>::push_back(const T& value) {
