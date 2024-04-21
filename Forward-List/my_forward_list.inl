@@ -71,12 +71,12 @@ namespace my {
     }
     clear();
     forward_list<T> tempList(other);
-    Node<T>* temp = tempList.pHead_;
-    while (temp) {
-      push_back(temp->value_);
-      temp = temp->pNext_;
+    Node<T>* tempHead = tempList.pHead_;
+    while (tempHead) {
+      push_back(tempHead->value_);
+      tempHead = tempHead->pNext_;
     }
-    pLast_ = tempList.pLast_;
+    pLast_ = tempHead.pLast_;
     return *this;
   }
 
@@ -222,22 +222,6 @@ namespace my {
   template<typename T>
   forward_list<T>::~forward_list() noexcept {
     clear();
-  }
-
-  template<typename T>
-  std::ostream &operator<<(std::ostream &s, const forward_list<T> &v) {
-    s.put('{');
-    if (!v.isEmpty()) {
-      auto current = v.pHead_;
-      while (current) {
-        s << current->value_;
-        if (current->pNext_) {
-          s << ", ";
-        }
-        current = current->pNext_;
-      }
-    }
-    return s << "}\n";
   }
 }
 

@@ -1,6 +1,7 @@
 #ifndef FAST_TRACK_TELECOM_FORWARD_LIST_HPP
 #define FAST_TRACK_TELECOM_FORWARD_LIST_HPP
 
+//#include "iterator.hpp"
 #include <initializer_list>
 #include <iostream>
 
@@ -32,10 +33,14 @@ namespace my {
     bool isEmpty() const { return size_ == 0; };
     void print() const;
     
-    friend std::ostream &operator<<(std::ostream &s, const forward_list<T> &v);
+    T front() const { return pHead_->value_; }
+    T back() const { return pLast_->value_; }
+    
+    /*Iterator<T> begin() { return Iterator<T>(pHead_); }
+    Iterator<T> end() { return Iterator<T>(nullptr); }*/
     
     ~forward_list() noexcept;
-
+    
   private:
     template<typename N>
     struct Node {
@@ -49,9 +54,9 @@ namespace my {
     Node<T> *pHead_;
     Node<T> *pLast_;
     size_t size_;
+    Iterator<T> iter_;
   };
-}
-
+  
 #include "my_forward_list.inl"
 
 #endif // FAST_TRACK_TELECOM_FORWARD_LIST_HPP

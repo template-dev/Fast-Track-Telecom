@@ -10,3 +10,7 @@ add_subdirectory(
 add_subdirectory(
         ${CMAKE_CURRENT_SOURCE_DIR}/Forward-List
 )
+
+add_subdirectory(
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tokenize
+)
