@@ -155,7 +155,6 @@ namespace my {
           pop_front();
         } else {
           prev->pNext_ = std::move(current->pNext_);
-          
           delete current;
         }
         --size_;
