@@ -8,7 +8,6 @@ add_executable(
         ${PROJECT_NAME}
         my_forward_list.hpp
         my_forward_list.inl
-        iterator.hpp
         main.cpp
 )
 

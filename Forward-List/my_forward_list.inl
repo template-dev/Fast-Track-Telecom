@@ -17,26 +17,17 @@ namespace my {
   forward_list<T>::forward_list(const size_t &count, const T& value) noexcept
     : forward_list() {
       for (size_t i = 0; i < count; ++i) {
-        Node <T> *pNewNode = new Node<T>(value);
-        if (!pHead_) {
-          pHead_ = pNewNode;
-          pLast_ = pNewNode;
-        } else {
-          pLast_->pNext_ = pNewNode;
-          pLast_ = pNewNode;
-        }
-        ++size_;
+        push_back(value);
       }
   }
 
   template<typename T>
   forward_list<T>::forward_list(const std::initializer_list<T>& init) noexcept
-    : pHead_(nullptr)
-    , pLast_(nullptr)
-    , size_(init.size()) {
+    : forward_list() {
     for (auto it = init.begin(); it != init.end(); ++it) {
       push_back(*it);
     }
+    size_ = init.size();
   }
 
   template<typename T>
@@ -45,10 +36,10 @@ namespace my {
     if (&other == this || !other.pHead_) {
       return;
     }
-    Node <T> *tmp = other.pHead_;
-    while(tmp) {
-      push_back(tmp->value_);
-      tmp = tmp->pNext_;
+    Node* current = other.pHead_.get();
+    while(current) {
+      push_back(current->value_);
+      current = current->pNext_.get();
     }
     size_ = other.size_;
   }
@@ -94,18 +85,26 @@ namespace my {
 
   template<typename T>
   void forward_list<T>::push_back(const T &value) {
-    Node <T> *pNewNode = new Node<T>(value);
-    if (!pHead_) pHead_ = pNewNode;
-    if (pLast_) pLast_->pNext_ = pNewNode;
-    pLast_ = pNewNode;
+    std::unique_ptr<Node> pNewNode = std::make_unique<Node>(value);
+    if (!pHead_) {
+      pHead_ = std::move(pNewNode);
+      pLast_ = pHead_.get();
+    } else {
+      pLast_->pNext_ = std::move(pNewNode);
+      pLast_ = pLast_->pNext_.get();
+    }
     ++size_;
   }
 
   template<typename T>
   void forward_list<T>::push_front(const T &value) {
-    pHead_ = new Node<T>(value, pHead_);
-    if (!pLast_) {
-      pLast_ = pHead_;
+    std::unique_ptr<Node> newNode = std::make_unique<Node>(value);
+    if (!pHead_) {
+      pHead_ = std::move(newNode);
+      pLast_ = pHead_.get();
+    } else {
+      newNode->pNext_ = std::move(pHead_);
+      pHead_ = std::move(newNode);
     }
     ++size_;
   }
@@ -116,19 +115,16 @@ namespace my {
       return;
     }
 
-    if (pHead_ == pLast_) {
-      delete pHead_;
-      pHead_ = nullptr;
+    if (pHead_.get() == pLast_) {
+      pHead.reset();
       pLast_ = nullptr;
       --size_;
       return;
     }
 
-    Node <T> *prev = pHead_;
-    for (; prev->pNext_ != pLast_; prev = prev->pNext_);
-
-    prev->pNext_ = nullptr;
-    delete pLast_;
+    Node *prev = pHead_.get();
+    for (; prev->pNext_.get() != pLast_; prev = prev->pNext_.get());
+    prev->pNext_.reset();
     pLast_ = prev;
     --size_;
   }
@@ -138,11 +134,8 @@ namespace my {
     if (!pHead_) {
       return;
     }
-
-    Node <T> *pCur = pHead_;
-    pHead_ = pCur->pNext_;
-
-    delete pCur;
+    std::unique_ptr<Node> tempHead = std::move(pHead_);
+    pHead_ = std::move(tempHead->pNext_);
     --size_;
   }
 
@@ -151,29 +144,23 @@ namespace my {
     if (!pHead_) {
       return;
     }
-
-    if (pHead_->value_ == value) {
-      pop_front();
-      return;
-    } else if (pLast_->value_ == value) {
-      pop_back();
-      return;
+    
+    Node* current = pHead_.get();
+    Node* prev = nullptr;
+    
+    while (current) {
+      if (current->value_ == value) {
+        if (current == pHead_.get()) {
+          pHead_ = std::move(current->pNext_);
+        } else {
+          prev->pNext_ = std::move(current->pNext_);
+        }
+        --size_;
+        return;
+      }
+      prev = current;
+      current = current->pNext_.get();
     }
-
-    Node <T> *slow = pHead_;
-    Node <T> *fast = pHead_->pNext_;
-
-    while (fast && (fast->value_ != value)) {
-      fast = fast->pNext_;
-      slow = slow->pNext_;
-    }
-
-    if (!fast) {
-      return;
-    }
-
-    slow->pNext_ = fast->pNext_;
-    delete fast;
   }
 
   template<typename T>
@@ -181,21 +168,29 @@ namespace my {
     if ((!pHead_ && (pos > size_ || pos < 0)) || (pHead_ && (pos > size_ || pos < 0))) {
       return;
     }
-
-    if (pos == 0) {
-      push_front(value);
-    } else {
-      Node <T> *prev = pHead_;
-      for (int i = 0; i < pos - 1; ++i) {
-        prev = prev->pNext_;
+    
+    std::unique_ptr<Node> newNode = std::make_unique<Node>(value);
+    
+    if (pos == 0 || !pHead_) {
+      newNode->pNext_ = std::move(pHead_);
+      pHead_ = std::move(newNode);
+      if (!pLast_) {
+        pLast_ = pHead_.get();
       }
-      prev->pNext_ = new Node<T>(value, prev->pNext_);
-      ++size_;
-
-      if (prev == pLast_) {
-        pLast_ = prev->pNext_;
+    } else {
+      Node* current = pHead_.get();
+      for (size_t i = 0; i < pos - 1; ++i) {
+        current = current->pNext_.get();
+      }
+      
+      newNode->pNext_ = std::move(current->pNext_);
+      current->pNext_ = std::move(newNode);
+      
+      if (!newNode->pNext_) {
+        pLast_ = newNode.get();
       }
     }
+    ++size_;
   }
 
   template<typename T>
@@ -204,10 +199,10 @@ namespace my {
       return;
     }
 
-    Node <T> *pCurrent = pHead_;
+    Node* pCurrent = pHead_.get();
     while (pCurrent) {
       std::cout << pCurrent->value_ << " ";
-      pCurrent = pCurrent->pNext_;
+      pCurrent = pCurrent->pNext_.get();
     }
     std::cout << std::endl;
   }
@@ -224,4 +219,3 @@ namespace my {
     clear();
   }
 }
-
