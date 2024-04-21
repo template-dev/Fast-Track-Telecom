@@ -17,6 +17,8 @@ int main(int argc, char* argv[]) {
       std::cout << "Minus" << std::endl;
     } else if (std::holds_alternative<Plus>(token)) {
       std::cout << "Plus" << std::endl;
+    } else if (std::holds_alternative<Multiply>(token)) {
+      std::cout << "Multiply" << std::endl;
     }
   }
   
