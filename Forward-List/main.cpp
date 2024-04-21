@@ -5,6 +5,7 @@ int main(int argc, char* argv[]) {
   std::cout << lst << std::endl;
   lst.pop_front();
   lst.erase(2);
+  std::cout << (lst.find(3) ? "Found" : "Not Found") << std::endl;
   
   std::cout << "[List 1]" << std::endl;
   lst.print();

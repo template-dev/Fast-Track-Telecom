@@ -220,4 +220,14 @@ namespace my {
   forward_list<T>::~forward_list() noexcept {
     clear();
   }
+
+  template<typename T>
+  typename forward_list<T>::Node* forward_list<T>::find(const T& value) const {
+    for(auto current = pHead_.get(); current; current = current->pNext_.get()) {
+      if (current->value_ == value) {
+        return current;
+      }
+    }
+    return nullptr;
+  }
 }

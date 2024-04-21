@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <ostream>
+#include <algorithm>
 
 namespace my {
   template<typename T>
@@ -27,18 +28,16 @@ namespace my {
     void pop_front();
     void erase(const T &value);
     void clear();
+    void print() const;
+    
+    struct Node;
+    Node* find(const T& value) const;
     
     size_t size() const { return size_; }
     bool isEmpty() const { return size_ == 0; };
     
-    void print() const;
-    
     T front() const { return pHead_->value_; }
     T back() const { return pLast_->value_; }
-    
-    T& operator*() const {
-      return pNode_->value_;
-    }
     
     friend std::ostream& operator<<(std::ostream& os, const forward_list& lst) {
       auto pCurrent = lst.pHead_.get();
