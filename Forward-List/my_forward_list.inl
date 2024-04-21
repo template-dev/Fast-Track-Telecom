@@ -50,13 +50,13 @@ namespace my {
   template<typename T>
   forward_list<T>::forward_list(const forward_list <T> &other) noexcept
     : forward_list() {
-    if (!other.pHead_) {
+    if (&other == this || !other.pHead_) {
       return;
     }
     
     Node <T> *tmp = nullptr;
-    for(Node <T> begin = other.pHead_; begin != nullptr; begin = begin->pNext_ ) {
-      Node *item = new Node(begin->value_);
+    for(Node<T>* begin = other.pHead_; begin != nullptr; begin = begin->pNext_ ) {
+      Node<T>* item = new Node<T>(begin->value_);
       if(!pHead_) {
         pHead_ = item;
       } else {
@@ -67,7 +67,18 @@ namespace my {
         pLast_ = item;
       }
     }
-    size__ = other.size_;
+    size_ = other.size_;
+  }
+
+  template<typename T>
+  forward_list<T>::forward_list(forward_list &&other) noexcept
+    : forward_list() {
+    if (&other == this) {
+      return;
+    }
+    std::swap(pHead_, other.pHead_);
+    std::swap(pLast_, other.pLast_);
+    std::swap(size_, other.size_);
   }
   
   template<typename T>
@@ -121,6 +132,7 @@ namespace my {
     
     Node <T> *pCur = pHead_;
     pHead_ = pCur->pNext_;
+    
     delete pCur;
     --size_;
   }
@@ -219,3 +231,4 @@ namespace my {
     return s << "}\n";
   }
 }
+

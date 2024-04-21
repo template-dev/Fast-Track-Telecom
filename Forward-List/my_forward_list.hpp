@@ -13,7 +13,7 @@ namespace my {
     forward_list(const size_t &count, const T& value) noexcept;
     forward_list(const std::initializer_list<T>& init) noexcept;
     
-    forward_list(const forward_list &other) noexcept; // -
+    forward_list(const forward_list &other) noexcept;
     forward_list(forward_list &&other) noexcept; // -
     
     forward_list &operator=(const forward_list &other) noexcept; // -
@@ -35,7 +35,7 @@ namespace my {
     friend std::ostream &operator<<(std::ostream &s, const forward_list<T> &v);
     
     ~forward_list() noexcept;
-  
+
   private:
     template<typename N>
     struct Node {
