@@ -11,8 +11,7 @@ using Token = std::variant<OpeningBracket, ClosingBracket, Number, UnknownToken,
               MinToken, AbsToken, Plus, Minus, Multiply, Modulo, Divide, Max, Sqr>;
 
 const std::unordered_map<char, Token> kSymbol2Token{
-        {'+', Plus{}}, {'-', Minus{}}, {'*', Multiply{}}, {'/', Divide{}}, {'%', Modulo{}}
-        ,{'^', Sqr{}}};
+        {'+', Plus{}}, {'-', Minus{}}, {'*', Multiply{}}, {'/', Divide{}}, {'%', Modulo{}}};
 
 int ToDigit(unsigned char symbol) { return symbol - '0'; }
 
