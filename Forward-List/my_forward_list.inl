@@ -7,12 +7,12 @@ namespace my {
     , pLast_(nullptr)
     , size_(0)
   {}
-  
+
   template<typename T>
   forward_list<T>::forward_list(const size_t &count) noexcept
     : forward_list(count, T())
   {}
-  
+
   template<typename T>
   forward_list<T>::forward_list(const size_t &count, const T& value) noexcept
     : forward_list() {
@@ -29,7 +29,7 @@ namespace my {
       ++size_;
     }
   }
-  
+
   template<typename T>
   forward_list<T>::forward_list(const std::initializer_list<T>& init) noexcept
     : pHead_(nullptr)
@@ -46,14 +46,14 @@ namespace my {
       }
     }
   }
-  
+
   template<typename T>
-  forward_list<T>::forward_list(const forward_list <T> &other) noexcept
+  forward_list<T>::forward_list(const forward_list &other) noexcept
     : forward_list() {
     if (&other == this || !other.pHead_) {
       return;
     }
-    
+
     Node <T> *tmp = nullptr;
     for(Node<T>* begin = other.pHead_; begin != nullptr; begin = begin->pNext_ ) {
       Node<T>* item = new Node<T>(begin->value_);
@@ -73,14 +73,43 @@ namespace my {
   template<typename T>
   forward_list<T>::forward_list(forward_list &&other) noexcept
     : forward_list() {
-    if (&other == this) {
+    if (&other == this || !other.pHead_) {
       return;
     }
     std::swap(pHead_, other.pHead_);
     std::swap(pLast_, other.pLast_);
     std::swap(size_, other.size_);
   }
-  
+
+  template<typename T>
+  forward_list<T> &forward_list<T>::operator=(const forward_list &other) noexcept {
+    if (this == &other) {
+      return *this;
+    }
+    clear();
+
+    Node<T>* temp = other.pHead_;
+    while (temp) {
+      push_back(temp->value_);
+      temp = temp->pNext_;
+    }
+    pLast_ = other.pLast_;
+
+    return *this;
+  }
+
+  template<typename T>
+  forward_list<T> & forward_list<T>::operator=(forward_list &&other) noexcept {
+    if (this == &other) {
+      return *this;
+    }
+    clear();
+    std::swap(pHead_, other.pHead_);
+    std::swap(pLast_, other.pLast_);
+    std::swap(size_, other.size_);
+    return *this;
+  }
+
   template<typename T>
   void forward_list<T>::push_back(const T &value) {
     Node <T> *pNewNode = new Node<T>(value);
@@ -89,7 +118,7 @@ namespace my {
     pLast_ = pNewNode;
     ++size_;
   }
-  
+
   template<typename T>
   void forward_list<T>::push_front(const T &value) {
     Node <T> *pNewNode = new Node<T>(value);
@@ -100,13 +129,13 @@ namespace my {
     }
     ++size_;
   }
-  
+
   template<typename T>
   void forward_list<T>::pop_back() {
     if (!pHead_) {
       return;
     }
-    
+
     if (pHead_ == pLast_) {
       delete pHead_;
       pHead_ = nullptr;
@@ -114,35 +143,35 @@ namespace my {
       --size_;
       return;
     }
-    
+
     Node <T> *prev = pHead_;
     for (; prev->pNext_ != pLast_; prev = prev->pNext_);
-    
+
     prev->pNext_ = nullptr;
     delete pLast_;
     pLast_ = prev;
     --size_;
   }
-  
+
   template<typename T>
   void forward_list<T>::pop_front() {
     if (!pHead_) {
       return;
     }
-    
+
     Node <T> *pCur = pHead_;
     pHead_ = pCur->pNext_;
-    
+
     delete pCur;
     --size_;
   }
-  
+
   template<typename T>
   void forward_list<T>::erase(const T &value) {
     if (!pHead_) {
       return;
     }
-    
+
     if (pHead_->value_ == value) {
       pop_front();
       return;
@@ -150,29 +179,29 @@ namespace my {
       pop_back();
       return;
     }
-    
+
     Node <T> *slow = pHead_;
     Node <T> *fast = pHead_->pNext_;
-    
+
     while (fast && (fast->value_ != value)) {
       fast = fast->pNext_;
       slow = slow->pNext_;
     }
-    
+
     if (!fast) {
       return;
     }
-    
+
     slow->pNext_ = fast->pNext_;
     delete fast;
   }
-  
+
   template<typename T>
   void forward_list<T>::insert(const size_t &pos, const T &value) {
     if ((!pHead_ && (pos > size_ || pos < 0)) || (pHead_ && (pos > size_ || pos < 0))) {
       return;
     }
-    
+
     if (pos == 0) {
       push_front(value);
     } else {
@@ -182,19 +211,19 @@ namespace my {
       }
       prev->pNext_ = new Node<T>(value, prev->pNext_);
       ++size_;
-      
+
       if (prev == pLast_) {
         pLast_ = prev->pNext_;
       }
     }
   }
-  
+
   template<typename T>
   void forward_list<T>::print() const {
     if (isEmpty()) {
       return;
     }
-    
+
     Node <T> *pCurrent = pHead_;
     while (pCurrent) {
       std::cout << pCurrent->value_ << " ";
@@ -202,14 +231,14 @@ namespace my {
     }
     std::cout << std::endl;
   }
-  
+
   template<typename T>
   void forward_list<T>::clear() {
     while (size_) {
       pop_front();
     }
   }
-  
+
   template<typename T>
   forward_list<T>::~forward_list() noexcept {
     clear();

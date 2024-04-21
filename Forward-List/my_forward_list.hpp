@@ -14,10 +14,10 @@ namespace my {
     forward_list(const std::initializer_list<T>& init) noexcept;
     
     forward_list(const forward_list &other) noexcept;
-    forward_list(forward_list &&other) noexcept; // -
+    forward_list(forward_list &&other) noexcept;
     
-    forward_list &operator=(const forward_list &other) noexcept; // -
-    forward_list &operator=(forward_list &&other) noexcept; // -
+    forward_list &operator=(const forward_list &other) noexcept;
+    forward_list &operator=(forward_list &&other) noexcept;
     
     void push_back(const T &value);
     void push_front(const T &value);
