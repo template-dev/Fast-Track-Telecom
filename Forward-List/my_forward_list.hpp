@@ -10,8 +10,8 @@ namespace my {
   public:
     forward_list() noexcept;
     explicit forward_list(const size_t &count) noexcept;
-    explicit forward_list(const size_t &count, const T& value) noexcept;
-    forward_list(std::initializer_list <T> init) noexcept;
+    forward_list(const size_t &count, const T& value) noexcept;
+    forward_list(const std::initializer_list<T>& init) noexcept;
     
     forward_list(const forward_list &other) noexcept; // -
     forward_list(forward_list &&other) noexcept; // -

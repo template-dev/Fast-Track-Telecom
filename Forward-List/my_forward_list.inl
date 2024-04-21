@@ -31,7 +31,7 @@ namespace my {
   }
   
   template<typename T>
-  forward_list<T>::forward_list(std::initializer_list <T> init) noexcept
+  forward_list<T>::forward_list(const std::initializer_list<T>& init) noexcept
     : pHead_(nullptr)
     , pLast_(nullptr)
     , size_(init.size()) {
