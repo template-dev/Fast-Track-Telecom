@@ -1,11 +1,8 @@
-#include "forward_list.hpp"
-#include <iostream>
+#include "my_forward_list.hpp"
 
 int main(int argc, char* argv[]) {
-  forward_list<int> lst;
-  lst.push_back(5);
-  lst.push_back(10);
-  lst.push_front(0);
+  my::forward_list<int> lst(5, 1);
+  std::cout << "Size: " << lst.size() << std::endl;
   lst.print();
   
   return 0;

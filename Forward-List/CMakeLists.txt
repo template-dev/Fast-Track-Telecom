@@ -6,8 +6,8 @@ project(${PROJECT_NAME})
 
 add_executable(
         ${PROJECT_NAME}
-        forward_list.hpp
-        forward_list.inl
+        my_forward_list.hpp
+        my_forward_list.inl
         main.cpp
 )
 
