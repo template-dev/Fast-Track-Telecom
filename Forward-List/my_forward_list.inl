@@ -137,6 +137,7 @@ namespace my {
     std::unique_ptr<Node> tempHead = std::move(pHead_);
     pHead_ = std::move(tempHead->pNext_);
     --size_;
+    tempHead.reset();
   }
 
   template<typename T>
@@ -151,9 +152,11 @@ namespace my {
     while (current) {
       if (current->value_ == value) {
         if (current == pHead_.get()) {
-          pHead_ = std::move(current->pNext_);
+          pop_front();
         } else {
           prev->pNext_ = std::move(current->pNext_);
+          
+          delete current;
         }
         --size_;
         return;
