@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <memory>
+#include <ostream>
 
 namespace my {
   template<typename T>
@@ -37,6 +38,15 @@ namespace my {
     
     T& operator*() const {
       return pNode_->value_;
+    }
+    
+    friend std::ostream& operator<<(std::ostream& os, const forward_list& lst) {
+      auto pCurrent = lst.pHead_.get();
+      while (pCurrent) {
+        os << pCurrent->value_ << " ";
+        pCurrent = pCurrent->pNext_.get();
+      }
+      return os;
     }
     
     ~forward_list() noexcept;

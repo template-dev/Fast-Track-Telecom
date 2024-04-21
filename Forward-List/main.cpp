@@ -2,6 +2,7 @@
 
 int main(int argc, char* argv[]) {
   my::forward_list<int> lst{1, 2, 3, 4, 5};
+  std::cout << lst << std::endl;
   
   std::cout << "[List 1]" << std::endl;
   lst.print();
