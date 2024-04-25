@@ -5,13 +5,15 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+#define CLIENT_TAG "[CLIENT]: "
+
 int main() {
     const char *SERVER_IP = "127.0.0.1";
-    const int SERVER_PORT = 12344;
+    constexpr int SERVER_PORT = 12343;
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket == -1) {
-        std::cerr << "Ошибка создания сокета\n";
+        std::cerr << CLIENT_TAG << "Ошибка создания сокета\n";
         return 1;
     }
 
@@ -21,12 +23,12 @@ int main() {
     inet_pton(AF_INET, SERVER_IP, &serverAddr.sin_addr);
 
     if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1) {
-        std::cerr << "Ошибка подключения к серверу\n";
+        std::cerr << CLIENT_TAG << "Ошибка подключения к серверу\n";
         close(clientSocket);
         return 1;
     }
 
-    std::cout << "Подключение к серверу выполнено успешно.\n";
+    std::cout << CLIENT_TAG << "Подключение к серверу выполнено успешно.\n";
 
     bool isRunning = true;
     while(isRunning) {
@@ -35,28 +37,28 @@ int main() {
         }
 
         std::string message = "";
-        std::cout << "Введите сообщение: ";
+        std::cout << CLIENT_TAG << "Введите сообщение: ";
         std::getline(std::cin, message);
         if (send(clientSocket, message.data(), message.size(), 0) == -1) {
-            std::cerr << "Ошибка отправки данных на сервер\n";
+            std::cerr << CLIENT_TAG << "Ошибка отправки данных на сервер\n";
             isRunning = false;
         }
 
-        std::cout << "Данные отправлены на сервер: " << message << std::endl;
+        std::cout << CLIENT_TAG << "Данные успешно отправлены на сервер!" << std::endl;
 
         char buffer[1024];
         int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (bytesReceived == -1) {
-            std::cerr << "Ошибка при получении данных от сервера\n";
+            std::cerr << CLIENT_TAG << "Ошибка при получении данных от сервера\n";
             isRunning = false;
             break;
         } else if (bytesReceived == 0) {
-            std::cout << "Сервер отключился\n";
+            std::cout << CLIENT_TAG << "Сервер отключился\n";
             isRunning = false;
             break;
         }
 
-        std::cout << "[SERVER]: " << std::string(buffer, bytesReceived) << std::endl;
+        std::cout << std::string(buffer, bytesReceived) << std::endl;
     }
     close(clientSocket);
 
