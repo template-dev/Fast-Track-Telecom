@@ -7,7 +7,7 @@
 
 int main() {
     const char *SERVER_IP = "127.0.0.1";
-    const int SERVER_PORT = 12346;
+    const int SERVER_PORT = 12344;
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket == -1) {
@@ -30,7 +30,12 @@ int main() {
 
     bool isRunning = true;
     while(isRunning) {
+        if (!isRunning) {
+            break;
+        }
+
         std::string message = "";
+        std::cout << "Введите сообщение: ";
         std::getline(std::cin, message);
         if (send(clientSocket, message.data(), message.size(), 0) == -1) {
             std::cerr << "Ошибка отправки данных на сервер\n";
@@ -44,9 +49,11 @@ int main() {
         if (bytesReceived == -1) {
             std::cerr << "Ошибка при получении данных от сервера\n";
             isRunning = false;
+            break;
         } else if (bytesReceived == 0) {
             std::cout << "Сервер отключился\n";
             isRunning = false;
+            break;
         }
 
         std::cout << "[SERVER]: " << std::string(buffer, bytesReceived) << std::endl;

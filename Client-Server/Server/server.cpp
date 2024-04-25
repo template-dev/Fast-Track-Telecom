@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 int main() {
-    const int PORT = 12346;
+    const int PORT = 12344;
 
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
@@ -43,7 +43,7 @@ int main() {
             continue;
         }
 
-        std::cout << "Подключился клиент с IP: " << inet_ntoa(clientAddr.sin_addr) << ", порт: " << ntohs(clientAddr.sin_port) << std::endl;
+        std::cout << "Подключился клиент с IP: [" << inet_ntoa(clientAddr.sin_addr) << "], порт: [" << ntohs(clientAddr.sin_port) << "]" << std::endl;
 
         while (true) {
             char buffer[1024];
@@ -68,7 +68,7 @@ int main() {
                     close(clientSocket);
                     break;
                 }
-                std::cout << "Соединение с клиентом " << inet_ntoa(clientAddr.sin_addr) << " потеряно." << std::endl;
+                std::cout << "Соединение с клиентом [" << inet_ntoa(clientAddr.sin_addr) << "] потеряно." << std::endl;
                 close(clientSocket);
                 break;
             }
