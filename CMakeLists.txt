@@ -7,10 +7,14 @@ add_subdirectory(
         ${CMAKE_CURRENT_SOURCE_DIR}/Bitwise-Operations
 )
 
-add_subdirectory(
-        ${CMAKE_CURRENT_SOURCE_DIR}/Forward-List
-)
+#add_subdirectory(
+#        ${CMAKE_CURRENT_SOURCE_DIR}/Forward-List
+#)
 
 add_subdirectory(
         ${CMAKE_CURRENT_SOURCE_DIR}/Tokenize
+)
+
+add_subdirectory(
+        ${CMAKE_CURRENT_SOURCE_DIR}/Client-Server
 )
