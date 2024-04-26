@@ -11,7 +11,7 @@
 
 #define SERVER_TAG "[SERVER]: "
 
-void deserialize(int ac, char **av, Registration_t *registration);
+void decode(int ac, char **av, Registration_t *registration);
 void handleClient(int ac, char **av, int clientSocket, const sockaddr_in& clientAddr);
 
 int main(int ac, char **av) {
@@ -77,8 +77,8 @@ void handleClient(int ac, char **av, int clientSocket, const sockaddr_in& client
             close(clientSocket);
             break;
         }
-        printf("Deserialized");
-        deserialize(ac, av, &registration);
+        
+        decode(ac, av, &registration);
 
         if (bytesReceived == 0) {
             //std::cout << SERVER_TAG << "Клиент отключился [" << inet_ntoa(clientAddr.sin_addr) << "]:[" << ntohs(clientAddr.sin_port) << "]";
@@ -109,7 +109,7 @@ void handleClient(int ac, char **av, int clientSocket, const sockaddr_in& client
     }
 }
 
-void deserialize(int ac, char **av, Registration_t *registration) {
+void decode(int ac, char **av, Registration_t *registration) {
     char buf[1024];
     asn_dec_rval_t rval;
     FILE *fp;
