@@ -26,3 +26,7 @@ add_subdirectory(
 add_subdirectory(
         ${CMAKE_CURRENT_SOURCE_DIR}/Multithreading
 )
+
+add_subdirectory(
+        ${CMAKE_CURRENT_SOURCE_DIR}/Database-Task
+)
