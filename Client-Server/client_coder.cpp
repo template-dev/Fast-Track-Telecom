@@ -10,13 +10,19 @@
 #define CLIENT_TAG "[CLIENT]: "
 
 static int write_out(const void *buffer, size_t size, void *app_key);
-void coder(int ac, char **av, Registration** registration);
+void coder(int ac, char **av, Registration* registration);
 
 int main(int ac, char **av) {
     const char *SERVER_IP = "127.0.0.1";
     constexpr int SERVER_PORT = 12343;
 
-    Registration* registration = nullptr;
+    Registration_t registration;
+
+    OCTET_STRING_fromBuf(&registration.firstName, "Jack", std::strlen("Jack"));
+    OCTET_STRING_fromBuf(&registration.lastName, "Jackson", std::strlen("Jackson"));
+    OCTET_STRING_fromBuf(&registration.email, "jack@gmail.com", std::strlen("jack@gmail.com"));
+    OCTET_STRING_fromBuf(&registration.phone, "78562541211", std::strlen("78562541211"));
+
     coder(ac, av, &registration);
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_SCTP);
@@ -45,7 +51,7 @@ int main(int ac, char **av) {
         }
 
         struct sctp_sndrcvinfo sndrcvinfo;
-        if (sctp_sendmsg(clientSocket, registration, sizeof(Registration_t), (struct sockaddr *)&serverAddr, sizeof(serverAddr), 0, 0, 0, 0, 0) == -1) {
+        if (sctp_sendmsg(clientSocket, &registration, sizeof(Registration_t), (struct sockaddr *)&serverAddr, sizeof(serverAddr), 0, 0, 0, 0, 0) == -1) {
             printf("%s%s\n", CLIENT_TAG, "Ошибка отправки данных на сервер!\n");
             isRunning = false;
         }
@@ -78,19 +84,8 @@ static int write_out(const void *buffer, size_t size, void *app_key) {
     return (wrote == size) ? 0 : -1;
 }
 
-void coder(int ac, char **av, Registration** registration) {
+void coder(int ac, char **av, Registration* registration) {
     asn_enc_rval_t ec;
-
-    *registration = (Registration*)calloc(1, sizeof(Registration_t));
-    if (!*registration) {
-        perror("calloc() failed");
-        exit(1);
-    }
-
-    OCTET_STRING_fromBuf(&(*registration)->firstName, "Jack", std::strlen("Jack"));
-    OCTET_STRING_fromBuf(&(*registration)->lastName, "Jackson", std::strlen("Jackson"));
-    OCTET_STRING_fromBuf(&(*registration)->email, "jack@gmail.com", std::strlen("jack@gmail.com"));
-    OCTET_STRING_fromBuf(&(*registration)->phone, "78562541211", std::strlen("78562541211"));
 
     if (ac < 2) {
         fprintf(stderr, "Specify filename for BER output\n");
