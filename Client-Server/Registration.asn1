@@ -1,5 +1,5 @@
 Registration DEFINITIONS ::= BEGIN
-UserInformation ::= SEQUENCE {
+Registration ::= SEQUENCE {
     firstName UTF8String,
     lastName UTF8String,
     email UTF8String,

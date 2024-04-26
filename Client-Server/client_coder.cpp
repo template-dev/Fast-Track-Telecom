@@ -8,7 +8,13 @@
 
 #define CLIENT_TAG "[CLIENT]: "
 
-int main() {
+static int write_out(const void *buffer, size_t size, void *app_key) {
+    FILE *out_fp = app_key;
+    size_t wrote = fwrite(buffer, 1, size, out_fp);
+    return (wrote == size) ? 0 : -1;
+}
+
+int main(int ac, char **av) {
     const char *SERVER_IP = "127.0.0.1";
     constexpr int SERVER_PORT = 12343;
 
