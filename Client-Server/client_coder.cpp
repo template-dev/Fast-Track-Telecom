@@ -5,6 +5,7 @@
 #include <netinet/sctp.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <Registration.h>
 
 #define CLIENT_TAG "[CLIENT]: "
 
@@ -14,9 +15,49 @@ static int write_out(const void *buffer, size_t size, void *app_key) {
     return (wrote == size) ? 0 : -1;
 }
 
+void read_from_file(Registration* registration) {
+    asn_enc_rval_t ec;
+
+    registration = calloc(1, sizeof(Registration_t));
+    if (!registration) {
+        perror("calloc() failed");
+        exit(1);
+    }
+
+    registration->firstName = "Jack";
+    registration->lastName = "Jackson";
+    registration->email = "jack@gmail.com";
+    registration->phone = "+78562541211";
+
+    if (ac < 2) {
+        fprintf(stderr, "Specify filename for BER output\n");
+    } else {
+        const char *filename = av[1];
+        FILE *fp = fopen(filename, "wb");
+        if (!fp) {
+            perror(filename);
+            exit(1);
+        }
+
+        ec = der_encode(&asn_DEF_Rectangle, registration, write_out, fp);
+        fclose(fp);
+        if (ec.encoded == -1) {
+            fprintf(stderr, "Could not encode registration(at % s)\n",
+                    ec.failed_type ? ec.failed_type->name : "unknown");
+            exit(1);
+        } else {
+            fprintf(stderr, "Created % s with BER encoded registration\n", filename);
+        }
+    }
+    xer_fprint(stdout, &asn_DEF_Rectangle, rectangle);
+}
+
 int main(int ac, char **av) {
     const char *SERVER_IP = "127.0.0.1";
     constexpr int SERVER_PORT = 12343;
+
+    Registration* registration;
+    read_from_file(registration);
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_SCTP);
     if (clientSocket == -1) {
@@ -43,11 +84,11 @@ int main(int ac, char **av) {
             break;
         }
 
-        std::string message = "";
+        /*std::string message = "";
         std::cout << CLIENT_TAG << "Введите сообщение: ";
-        std::getline(std::cin, message);
+        std::getline(std::cin, message);*/
         struct sctp_sndrcvinfo sndrcvinfo;
-        if (sctp_sendmsg(clientSocket, message.data(), message.size(), (struct sockaddr *)&serverAddr, sizeof(serverAddr), 0, 0, 0, 0, 0) == -1) {
+        if (sctp_sendmsg(clientSocket, registration, sizeof(Registration_t), (struct sockaddr *)&serverAddr, sizeof(serverAddr), 0, 0, 0, 0, 0) == -1) {
             std::cerr << CLIENT_TAG << "Ошибка отправки данных на сервер\n";
             isRunning = false;
         }
