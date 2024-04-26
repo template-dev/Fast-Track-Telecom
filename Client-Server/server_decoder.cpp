@@ -37,8 +37,6 @@ int main(int ac, char **av) {
         return 1;
     }
 
-    //printf("%s%s\n", CLIENT_TAG, "Сервер запущен. Ожидание клиентов...\\n");
-
     while (true) {
         struct sockaddr_in clientAddr;
         socklen_t clientAddrLen = sizeof(clientAddr);
@@ -55,7 +53,7 @@ int main(int ac, char **av) {
 
 void handleClient(int ac, char **av, int clientSocket, const sockaddr_in& clientAddr) {
     while (true) {
-        Registration_t *registration = nullptr; // Объявление указателя на регистрацию
+        Registration_t *registration = nullptr;
         char buffer[1024];
         struct sockaddr_in from;
         int flags = 0;
@@ -72,7 +70,7 @@ void handleClient(int ac, char **av, int clientSocket, const sockaddr_in& client
             break;
         }
 
-        size_t registration_size = sizeof(Registration_t); // Начальный размер для структуры
+        size_t registration_size = sizeof(Registration_t);
         registration = (Registration_t *)malloc(registration_size);
         if (!registration) {
             close(clientSocket);
