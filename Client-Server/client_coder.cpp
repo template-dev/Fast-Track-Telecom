@@ -16,18 +16,21 @@ int main(int ac, char **av) {
     const char *SERVER_IP = "127.0.0.1";
     constexpr int SERVER_PORT = 12343;
 
-    Registration_t registration;
+    Registration_t *registration = (Registration_t *)malloc(sizeof(Registration_t));
+    if (!registration) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
+    }
 
-    OCTET_STRING_fromBuf(&registration.firstName, "Jack", std::strlen("Jack"));
-    OCTET_STRING_fromBuf(&registration.lastName, "Jackson", std::strlen("Jackson"));
-    OCTET_STRING_fromBuf(&registration.email, "jack@gmail.com", std::strlen("jack@gmail.com"));
-    OCTET_STRING_fromBuf(&registration.phone, "78562541211", std::strlen("78562541211"));
+    OCTET_STRING_fromBuf(&registration->firstName, "Jack", std::strlen("Jack"));
+    OCTET_STRING_fromBuf(&registration->lastName, "Jackson", std::strlen("Jackson"));
+    OCTET_STRING_fromBuf(&registration->email, "jack@gmail.com", std::strlen("jack@gmail.com"));
+    OCTET_STRING_fromBuf(&registration->phone, "78562541211", std::strlen("78562541211"));
 
-    coder(ac, av, &registration);
+    coder(ac, av, registration);
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_SCTP);
     if (clientSocket == -1) {
-        printf("%s%s\n", CLIENT_TAG, "Ошибка создания сокета!\n");
         return 1;
     }
 
@@ -37,7 +40,6 @@ int main(int ac, char **av) {
     inet_pton(AF_INET, SERVER_IP, &serverAddr.sin_addr);
 
     if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1) {
-        printf("%s%s\n", CLIENT_TAG, "Ошибка подключения к серверу\n");
         close(clientSocket);
         return 1;
     }
@@ -52,7 +54,6 @@ int main(int ac, char **av) {
 
         struct sctp_sndrcvinfo sndrcvinfo;
         if (sctp_sendmsg(clientSocket, &registration, sizeof(Registration_t), (struct sockaddr *)&serverAddr, sizeof(serverAddr), 0, 0, 0, 0, 0) == -1) {
-            printf("%s%s\n", CLIENT_TAG, "Ошибка отправки данных на сервер!\n");
             isRunning = false;
         }
 
@@ -63,18 +64,15 @@ int main(int ac, char **av) {
         int flags = 0;
         int bytesReceived = sctp_recvmsg(clientSocket, buffer, sizeof(buffer), (struct sockaddr *)&from, 0, 0, &flags);
         if (bytesReceived == -1) {
-            printf("%s%s\n", CLIENT_TAG, "Ошибка при получении данных от сервера!\n");
             isRunning = false;
             break;
         } else if (bytesReceived == 0) {
-            printf("%s%s\n", CLIENT_TAG, "Сервер отключился...\n");
             isRunning = false;
             break;
         }
-        //printf("%s%s\n", CLIENT_TAG, "Сервер отключился...\n");
     }
     close(clientSocket);
-
+    free(registration);
     return 0;
 }
 
