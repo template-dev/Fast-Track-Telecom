@@ -69,12 +69,15 @@ void handleClient(int ac, char **av, int clientSocket, const sockaddr_in& client
         struct sockaddr_in from;
         int flags = 0;
         struct sctp_sndrcvinfo sndrcvinfo;
+        //int bytesReceived = sctp_recvmsg(clientSocket, &registration, sizeof(Registration_t), (struct sockaddr*)&from, 0, &sndrcvinfo, &flags);
         int bytesReceived = sctp_recvmsg(clientSocket, &registration, sizeof(Registration_t), (struct sockaddr*)&from, 0, &sndrcvinfo, &flags);
+
         if (bytesReceived == -1) {
             //std::cerr << SERVER_TAG << "Ошибка при приеме данных\n";
             close(clientSocket);
             break;
         }
+        printf("Deserialized");
         deserialize(ac, av, &registration);
 
         if (bytesReceived == 0) {
