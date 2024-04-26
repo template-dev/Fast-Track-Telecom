@@ -2,6 +2,7 @@
 #include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/sctp.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 
@@ -11,7 +12,7 @@ int main() {
     const char *SERVER_IP = "127.0.0.1";
     constexpr int SERVER_PORT = 12343;
 
-    int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    int clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_SCTP);
     if (clientSocket == -1) {
         std::cerr << CLIENT_TAG << "Ошибка создания сокета\n";
         return 1;
@@ -31,7 +32,7 @@ int main() {
     std::cout << CLIENT_TAG << "Подключение к серверу выполнено успешно.\n";
 
     bool isRunning = true;
-    while(isRunning) {
+    while (isRunning) {
         if (!isRunning) {
             break;
         }
@@ -39,7 +40,8 @@ int main() {
         std::string message = "";
         std::cout << CLIENT_TAG << "Введите сообщение: ";
         std::getline(std::cin, message);
-        if (send(clientSocket, message.data(), message.size(), 0) == -1) {
+        struct sctp_sndrcvinfo sndrcvinfo;
+        if (sctp_sendmsg(clientSocket, message.data(), message.size(), (struct sockaddr *)&serverAddr, sizeof(serverAddr), 0, 0, 0, 0, 0) == -1) {
             std::cerr << CLIENT_TAG << "Ошибка отправки данных на сервер\n";
             isRunning = false;
         }
@@ -47,7 +49,9 @@ int main() {
         std::cout << CLIENT_TAG << "Данные успешно отправлены на сервер!" << std::endl;
 
         char buffer[1024];
-        int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
+        struct sockaddr_in from;
+        int flags = 0;
+        int bytesReceived = sctp_recvmsg(clientSocket, buffer, sizeof(buffer), (struct sockaddr *)&from, 0, 0, &flags);
         if (bytesReceived == -1) {
             std::cerr << CLIENT_TAG << "Ошибка при получении данных от сервера\n";
             isRunning = false;
