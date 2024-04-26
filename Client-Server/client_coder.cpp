@@ -31,6 +31,7 @@ int main(int ac, char **av) {
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_SCTP);
     if (clientSocket == -1) {
+        free(registration);
         return 1;
     }
 
@@ -41,6 +42,7 @@ int main(int ac, char **av) {
 
     if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1) {
         close(clientSocket);
+        free(registration);
         return 1;
     }
 

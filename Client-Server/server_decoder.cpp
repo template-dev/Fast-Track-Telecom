@@ -37,7 +37,7 @@ int main(int ac, char **av) {
         return 1;
     }
 
-    printf("%s%s\n", CLIENT_TAG, "Сервер запущен. Ожидание клиентов...\\n");
+    //printf("%s%s\n", CLIENT_TAG, "Сервер запущен. Ожидание клиентов...\\n");
 
     while (true) {
         struct sockaddr_in clientAddr;
@@ -55,19 +55,26 @@ int main(int ac, char **av) {
 
 void handleClient(int ac, char **av, int clientSocket, const sockaddr_in& clientAddr) {
     while (true) {
-        char buffer[1024];
-        Registration_t registration;
-        struct sockaddr_in from;
-        int flags = 0;
-        struct sctp_sndrcvinfo sndrcvinfo;
-        int bytesReceived = sctp_recvmsg(clientSocket, &registration, sizeof(Registration_t), (struct sockaddr*)&from, 0, &sndrcvinfo, &flags);
-
-        if (bytesReceived == -1) {
+        Registration_t *registration = (Registration_t *)malloc(sizeof(Registration_t));
+        if (!registration) {
             close(clientSocket);
             break;
         }
+
+        char buffer[1024];
+        struct sockaddr_in from;
+        int flags = 0;
+        struct sctp_sndrcvinfo sndrcvinfo;
+
+        int bytesReceived = sctp_recvmsg(clientSocket, registration, sizeof(Registration_t), (struct sockaddr*)&from, 0, &sndrcvinfo, &flags);
+        if (bytesReceived == -1) {
+            close(clientSocket);
+            free(registration);
+            break;
+        }
         
-        decode(ac, av, &registration);
+        decode(ac, av, registration);
+        free(registration);
 
         if (bytesReceived == 0) {
             close(clientSocket);
