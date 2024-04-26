@@ -3,17 +3,20 @@
 #include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/sctp.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
-#include <vector>
 
 #define SERVER_TAG "[SERVER]: "
 
 void handleClient(int clientSocket, const sockaddr_in& clientAddr) {
     while (true) {
         char buffer[1024];
-        int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
+        struct sockaddr_in from;
+        int flags = 0;
+        struct sctp_sndrcvinfo sndrcvinfo;
+        int bytesReceived = sctp_recvmsg(clientSocket, buffer, sizeof(buffer), (struct sockaddr*)&from, 0, &sndrcvinfo, &flags);
         if (bytesReceived == -1) {
             std::cerr << SERVER_TAG << "Ошибка при приеме данных\n";
             close(clientSocket);
@@ -30,7 +33,7 @@ void handleClient(int clientSocket, const sockaddr_in& clientAddr) {
 
         std::string connectionLostMessage = std::string(SERVER_TAG) + "Соединение потеряно!";
         if (std::string(buffer, bytesReceived) == "/close") {
-            if (send(clientSocket, connectionLostMessage.data(), connectionLostMessage.size(), 0) == -1) {
+            if (sctp_sendmsg(clientSocket, connectionLostMessage.data(), connectionLostMessage.size(), (struct sockaddr*)&from, 0, 0, 0, 0, 0, 0) == -1) {
                 std::cerr << SERVER_TAG << "Ошибка при отправке данных\n";
                 close(clientSocket);
                 break;
@@ -41,7 +44,7 @@ void handleClient(int clientSocket, const sockaddr_in& clientAddr) {
         }
 
         std::string answerFromServer = std::string(SERVER_TAG) + "Данные получены!";
-        if (send(clientSocket, answerFromServer.data(), answerFromServer.size(), 0) == -1) {
+        if (sctp_sendmsg(clientSocket, answerFromServer.data(), answerFromServer.size(), (struct sockaddr*)&from, 0, 0, 0, 0, 0, 0) == -1) {
             std::cerr << SERVER_TAG << "Ошибка при отправке данных\n";
             close(clientSocket);
             break;
@@ -52,7 +55,7 @@ void handleClient(int clientSocket, const sockaddr_in& clientAddr) {
 int main() {
     constexpr int PORT = 12343;
 
-    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    int serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_SCTP);
     if (serverSocket == -1) {
         std::cerr << SERVER_TAG << "Ошибка создания сокета\n";
         return 1;
