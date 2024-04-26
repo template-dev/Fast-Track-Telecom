@@ -55,21 +55,27 @@ int main(int ac, char **av) {
 
 void handleClient(int ac, char **av, int clientSocket, const sockaddr_in& clientAddr) {
     while (true) {
-        Registration_t *registration = (Registration_t *)malloc(sizeof(Registration_t));
-        if (!registration) {
-            close(clientSocket);
-            break;
-        }
-
+        Registration_t *registration = nullptr; // Объявление указателя на регистрацию
         char buffer[1024];
         struct sockaddr_in from;
         int flags = 0;
         struct sctp_sndrcvinfo sndrcvinfo;
 
-        int bytesReceived = sctp_recvmsg(clientSocket, registration, sizeof(Registration_t), (struct sockaddr*)&from, 0, &sndrcvinfo, &flags);
+        int bytesReceived = sctp_recvmsg(clientSocket, buffer, sizeof(buffer), (struct sockaddr*)&from, 0, &sndrcvinfo, &flags);
         if (bytesReceived == -1) {
             close(clientSocket);
-            free(registration);
+            break;
+        }
+
+        if (bytesReceived == 0) {
+            close(clientSocket);
+            break;
+        }
+
+        size_t registration_size = sizeof(Registration_t); // Начальный размер для структуры
+        registration = (Registration_t *)malloc(registration_size);
+        if (!registration) {
+            close(clientSocket);
             break;
         }
         
